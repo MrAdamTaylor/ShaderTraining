@@ -27,7 +27,8 @@ Material:
     m_Floats:
     - _ColorEnd: 1
     - _ColorStart: 0
+    - _Speed: 2
     m_Colors:
-    - _ColorA: {r: 1, g: 1, b: 1, a: 1}
-    - _ColorB: {r: 0, g: 0, b: 0, a: 1}
+    - _ColorA: {r: 1, g: 0, b: 0.009994984, a: 1}
+    - _ColorB: {r: 1, g: 0.6084906, b: 0.6500697, a: 1}
   m_BuildTextureStacks: []

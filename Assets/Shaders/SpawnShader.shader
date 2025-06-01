@@ -7,13 +7,25 @@ Shader "Unlit/SpawnShader"
         
         _ColorStart ("Color Start", Range(0,1) ) = 1
         _ColorEnd ("Color End", Range(0,1)) = 0
+        
+        _Speed ("Speed", Range(0.1,5)) = 2
     }
     SubShader
     {
-        Tags { "RenderType"="Opaque" }
+        Tags
+        {
+            "RenderType"="Transparent"
+            "Queue"="Transparent"
+        }
 
         Pass
         {
+            
+            Cull Off
+            ZWrite Off
+            Blend One One //additive
+            //Blend DstColor Zero //multiply
+            
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
@@ -27,6 +39,7 @@ Shader "Unlit/SpawnShader"
 
             float _ColorStart;
             float _ColorEnd;
+            float _Speed;
 
             // automatically filled out by Unity 
             struct MeshData
@@ -66,9 +79,15 @@ Shader "Unlit/SpawnShader"
                 //float t = saturate(InverseLerp(_ColorStart, _ColorEnd, i.uv.x));
                 //float outColor = lerp(_ColorA, _ColorB, t);
                 //return outColor;
+                float xOffset = cos(i.uv.x * TAU * 10) * 0.004f;
+                float t = cos((i.uv.y + xOffset - _Time.y * _Speed) * TAU * 5) * 0.5 + 0.5;
+                t *= 1-i.uv.y;
 
-                float t = abs(frac(i.uv.x * 5) * 2 - 1);
-                return t;
+                float topBottomRemover = (abs(i.normal.y) < 0.999);
+                float waves = t * topBottomRemover;
+                float4 gradient = lerp(_ColorA, _ColorB, i.uv.y);
+                
+                return gradient * waves;
             }
             ENDCG
         }
