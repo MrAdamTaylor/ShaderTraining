@@ -1,10 +1,12 @@
-Shader "Unlit/FirstShader"
+Shader "Unlit/SpawnShader"
 {
     Properties
     {
-        _Color ("Color", Color) = (1,1,1,1)
-        _Scale ("UV Scale", Float) = 1
-        _Offset ("UV Offset", Float) = 1
+        _ColorA ("Color A", Color) = (1,1,1,1)
+        _ColorB ("Color B", Color) = (1,1,1,1)
+        
+        _ColorStart ("Color Start", Range(0,1) ) = 1
+        _ColorEnd ("Color End", Range(0,1)) = 0
     }
     SubShader
     {
@@ -18,17 +20,21 @@ Shader "Unlit/FirstShader"
 
             #include "UnityCG.cginc"
 
-            float4 _Color;
-            float _Scale;
-            float _Offset;
+            #define TAU 6.28318530718
+
+            float4 _ColorA;
+            float4 _ColorB;
+
+            float _ColorStart;
+            float _ColorEnd;
 
             // automatically filled out by Unity 
             struct MeshData
             {
                 float4 vertex : POSITION; //Vertex Position - положение вершин
                 float3 normals : NORMAL;
-                float4 tangent : TANGENT;
-                float4 color : COLOR;
+                //float4 tangent : TANGENT;
+                //float4 color : COLOR;
                 
                 float2 uv0 : TEXCOORD0; //ui coordinates
             };
@@ -45,13 +51,24 @@ Shader "Unlit/FirstShader"
                 Interpolators o;
                 o.vertex = UnityObjectToClipPos(v.vertex); //local space to clip space
                 o.normal = UnityObjectToWorldNormal(v.normals); // just pass through
-                o.uv = (v.uv0 + _Offset) * _Scale;
+                o.uv = v.uv0;
                 return o;
+            }
+
+            float InverseLerp(float a, float b, float v)
+            {
+                return (v-a)/(b-a);
             }
 
             float4 frag (Interpolators i) : SV_Target
             {
-                return float4(i.normal, 1);
+                
+                //float t = saturate(InverseLerp(_ColorStart, _ColorEnd, i.uv.x));
+                //float outColor = lerp(_ColorA, _ColorB, t);
+                //return outColor;
+
+                float t = abs(frac(i.uv.x * 5) * 2 - 1);
+                return t;
             }
             ENDCG
         }
